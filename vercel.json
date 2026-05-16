@@ -6,14 +6,5 @@
       "source": "/(.*)",
       "destination": "/index.html"
     }
-  ],
-  "env": {
-    "VITE_UNSPLASH_ACCESS_KEY": "@unsplash_key",
-    "VITE_GOOGLE_FONTS_API_KEY": "@google_fonts_key",
-    "VITE_ANTHROPIC_API_KEY": "@anthropic_key",
-    "VITE_STRIPE_PUBLISHABLE_KEY": "@stripe_key",
-    "VITE_BUFFER_API_KEY": "@buffer_key",
-    "VITE_SUPABASE_URL": "@supabase_url",
-    "VITE_SUPABASE_ANON_KEY": "@supabase_key"
-  }
+  ]
 }
