@@ -1,0 +1,112 @@
+/* Media Features Section */
+.media-features-section {
+  margin: 40px auto;
+  max-width: 1000px;
+  padding: 0 20px;
+}
+
+.media-features-section > div {
+  margin: 20px 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .media-features-section {
+    padding: 0 10px;
+  }
+
+  .youtube-audio-extractor,
+  .video-uploader,
+  .image-slideshow,
+  .media-timeline {
+    padding: 15px !important;
+  }
+
+  .extractor-form {
+    flex-direction: column !important;
+  }
+
+  .form-group {
+    flex: unset !important;
+    width: 100%;
+  }
+
+  .url-input {
+    width: 100% !important;
+  }
+
+  .extract-btn {
+    width: 100%;
+  }
+
+  .effects-grid {
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)) !important;
+  }
+
+  .audio-info {
+    grid-template-columns: 1fr !important;
+  }
+
+  .duration-display {
+    flex-direction: column !important;
+  }
+}
+
+/* Animation keyframes for slideshow */
+@keyframes fadeSlide {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .youtube-audio-extractor,
+  .video-uploader,
+  .image-slideshow,
+  .media-timeline {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .effect-button,
+  .extract-btn,
+  .sync-btn {
+    transition: none !important;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .youtube-audio-extractor,
+  .video-uploader,
+  .image-slideshow,
+  .media-timeline {
+    filter: brightness(0.9);
+  }
+}

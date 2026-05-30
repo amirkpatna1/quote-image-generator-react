@@ -6,6 +6,11 @@ import Gallery from './components/Gallery';
 import Modal from './components/Modal';
 import Toast from './components/Toast';
 import AIStyleRecommender from './components/AIStyleRecommender';
+import YouTubeAudioExtractor from './components/YouTubeAudioExtractor';
+import VideoUploader from './components/VideoUploader';
+import ImageSlideshow from './components/ImageSlideshow';
+import MediaTimeline from './components/MediaTimeline';
+import './styles/media-features.css';
 import { fetchThemeImage, clearImageCache } from './utils/imageLibrary';
 import { useHistory } from './hooks/useHistory';
 import { useBrandKit } from './hooks/useBrandKit';
@@ -51,6 +56,19 @@ export default function App() {
   const [showAiRecommender, setShowAiRecommender] = useState(false);
   const [toast, setToast]                 = useState(() => initialShared ? '✓ Shared batch loaded!' : '');
   const toastTimerRef = useRef(null);
+
+  // New media features
+  const [youtubeAudio, setYoutubeAudio] = useState(null);
+  const [uploadedVideos, setUploadedVideos] = useState([]);
+  const [slideshowSettings, setSlideshowSettings] = useState({
+    transitionEffect: 'fade',
+    effectSettings: {},
+  });
+  const [mediaTimeline, setMediaTimeline] = useState({
+    imageDuration: 4,
+    videoDurations: {},
+    totalDuration: 0,
+  });
 
   const { history, saveEntry, removeEntry, clearHistory } = useHistory();
   const { brands, saveBrand, deleteBrand }               = useBrandKit();
@@ -209,6 +227,26 @@ export default function App() {
     setLogoDataUrl(null);
   }
 
+  // Media feature handlers
+  function handleAudioExtracted(audioData) {
+    setYoutubeAudio(audioData);
+    showToast(`✓ Audio extracted: ${audioData.title}`);
+  }
+
+  function handleVideosUploaded(videos) {
+    setUploadedVideos(videos);
+    showToast(`✓ ${videos.length} video(s) uploaded`);
+  }
+
+  function handleSlideshowChange(settings) {
+    setSlideshowSettings(settings);
+    showToast('✨ Slideshow effect updated');
+  }
+
+  function handleTimelineChange(timeline) {
+    setMediaTimeline(timeline);
+  }
+
   const configWithLogo = { ...config, logoImage: logoImage || undefined };
   const sampleQuote    = quotes[0] || null;
 
@@ -272,17 +310,44 @@ export default function App() {
         )}
 
         {step === 3 && bgImages.length > 0 && (
-          <Gallery
-            quotes={quotes}
-            config={configWithLogo}
-            bgImages={bgImages}
-            onPreview={setPreviewCanvas}
-            onRegenerate={(idx) => idx !== undefined ? regenerateSingle(idx) : handleRegenerateAll()}
-            onEditQuote={handleEditQuote}
-            onPickImage={handleBgImageSet}
-            onBgImageSet={handleBgImageSet}
-            onToast={showToast}
-          />
+          <>
+            <Gallery
+              quotes={quotes}
+              config={configWithLogo}
+              bgImages={bgImages}
+              onPreview={setPreviewCanvas}
+              onRegenerate={(idx) => idx !== undefined ? regenerateSingle(idx) : handleRegenerateAll()}
+              onEditQuote={handleEditQuote}
+              onPickImage={handleBgImageSet}
+              onBgImageSet={handleBgImageSet}
+              onToast={showToast}
+            />
+
+            {/* New Media Features */}
+            <div className="media-features-section">
+              <YouTubeAudioExtractor onAudioExtracted={handleAudioExtracted} />
+
+              <VideoUploader onVideosUploaded={handleVideosUploaded} maxVideos={5} />
+
+              {bgImages.length > 0 && (
+                <ImageSlideshow
+                  images={bgImages}
+                  duration={mediaTimeline.imageDuration || 4}
+                  transitionEffect={slideshowSettings.transitionEffect || 'fade'}
+                  onSettingsChange={handleSlideshowChange}
+                />
+              )}
+
+              {(youtubeAudio || uploadedVideos.length > 0 || bgImages.length > 0) && (
+                <MediaTimeline
+                  images={bgImages}
+                  videos={uploadedVideos}
+                  audio={youtubeAudio}
+                  onTimelineChange={handleTimelineChange}
+                />
+              )}
+            </div>
+          </>
         )}
       </main>
 
