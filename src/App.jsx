@@ -321,6 +321,10 @@ export default function App() {
               onPickImage={handleBgImageSet}
               onBgImageSet={handleBgImageSet}
               onToast={showToast}
+              youtubeAudio={youtubeAudio}
+              uploadedVideos={uploadedVideos}
+              slideshowSettings={slideshowSettings}
+              mediaTimeline={mediaTimeline}
             />
 
             {/* New Media Features */}

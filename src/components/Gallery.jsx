@@ -6,6 +6,7 @@ import ImagePicker from './ImagePicker';
 import CarouselBuilder from './CarouselBuilder';
 import PlatformPackExport from './PlatformPackExport';
 import ReelExport from './ReelExport';
+import AdvancedMediaExport from './AdvancedMediaExport';
 import { drawQuoteOnCanvas } from '../utils/canvasRenderer';
 import { getCanvasSize } from '../utils/canvasSizes';
 import { encodeShareLink } from '../utils/shareLink';
@@ -14,12 +15,17 @@ export default function Gallery({
   quotes, config, bgImages,
   onPreview, onRegenerate, onEditQuote, onPickImage, onToast,
   onBgImageSet,
+  youtubeAudio,
+  uploadedVideos,
+  slideshowSettings,
+  mediaTimeline,
 }) {
   const [editIndex,  setEditIndex]  = useState(null);
   const [pickIndex,  setPickIndex]  = useState(null);
   const [showCarousel, setShowCarousel] = useState(false);
   const [showPack,   setShowPack]   = useState(false);
   const [showReel,   setShowReel]   = useState(false);
+  const [showAdvancedExport, setShowAdvancedExport] = useState(false);
   const [dragIndex,  setDragIndex]  = useState(null);
   const [overIndex,  setOverIndex]  = useState(null);
   const dragOrder = useRef(null);
@@ -129,9 +135,22 @@ export default function Gallery({
           <button className="btn btn-ghost btn-sm" onClick={() => setShowPack(true)}>
             📦 Platform Pack
           </button>
-          <button className="btn btn-ghost btn-sm" onClick={() => setShowReel(true)}>
+          <button 
+            className="btn btn-ghost btn-sm" 
+            onClick={() => setShowReel(true)}
+            title="Basic MP4 export"
+          >
             🎬 Export MP4
           </button>
+          {(youtubeAudio || uploadedVideos.length > 0) && (
+            <button 
+              className="btn btn-accent btn-sm" 
+              onClick={() => setShowAdvancedExport(true)}
+              title="Advanced export with YouTube audio, videos, and effects"
+            >
+              ⚡ Advanced Export
+            </button>
+          )}
           <button className="btn btn-success" onClick={downloadAll}>
             <DownloadIcon /> Download All ZIP
           </button>
@@ -217,6 +236,19 @@ export default function Gallery({
           bgImages={bgImages}
           onClose={() => setShowPack(false)}
           onToast={onToast}
+        />
+      )}
+
+      {showAdvancedExport && (
+        <AdvancedMediaExport
+          quotes={quotes}
+          config={config}
+          bgImages={bgImages}
+          youtubeAudio={youtubeAudio}
+          uploadedVideos={uploadedVideos}
+          slideshowSettings={slideshowSettings}
+          mediaTimeline={mediaTimeline}
+          onClose={() => setShowAdvancedExport(false)}
         />
       )}
     </div>
