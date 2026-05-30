@@ -14,9 +14,11 @@ Extract audio directly from YouTube videos and use it as your video soundtrack.
 4. The extracted audio becomes your soundtrack duration reference
 
 **Supported URLs:**
-- `https://www.youtube.com/watch?v=VIDEO_ID`
-- `https://youtu.be/VIDEO_ID`
-- `https://www.youtube.com/embed/VIDEO_ID`
+- `https://www.youtube.com/watch?v=VIDEO_ID` - Regular videos
+- `https://www.youtube.com/shorts/VIDEO_ID` - YouTube Shorts ✨
+- `https://youtu.be/VIDEO_ID` - Shortened URLs
+- `https://www.youtube.com/embed/VIDEO_ID` - Embed format
+- Just the Video ID (11 characters)
 
 **Note:** Audio extraction works via metadata extraction. For full audio download, you may need to use desktop tools like `yt-dlp`.
 

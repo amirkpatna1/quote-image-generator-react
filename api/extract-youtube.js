@@ -56,7 +56,15 @@ export default async function handler(req, res) {
 function extractVideoId(url) {
   // Handle various YouTube URL formats
   const patterns = [
-    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+    // Regular YouTube: youtube.com/watch?v=VIDEO_ID
+    /(?:youtube\.com\/watch\?v=)([^&\n?#]+)/,
+    // YouTube Shorts: youtube.com/shorts/VIDEO_ID
+    /(?:youtube\.com\/shorts\/)([^&\n?#]+)/,
+    // Shortened: youtu.be/VIDEO_ID
+    /(?:youtu\.be\/)([^&\n?#]+)/,
+    // Embed: youtube.com/embed/VIDEO_ID
+    /(?:youtube\.com\/embed\/)([^&\n?#]+)/,
+    // Just the video ID (11 characters)
     /^([a-zA-Z0-9_-]{11})$/,
   ];
 

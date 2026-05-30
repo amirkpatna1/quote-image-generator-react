@@ -49,7 +49,15 @@ export default function YouTubeAudioExtractor({ onAudioExtracted }) {
 
   const extractVideoId = (url) => {
     const patterns = [
-      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+      // Regular YouTube: youtube.com/watch?v=VIDEO_ID
+      /(?:youtube\.com\/watch\?v=)([^&\n?#]+)/,
+      // YouTube Shorts: youtube.com/shorts/VIDEO_ID
+      /(?:youtube\.com\/shorts\/)([^&\n?#]+)/,
+      // Shortened: youtu.be/VIDEO_ID
+      /(?:youtu\.be\/)([^&\n?#]+)/,
+      // Embed: youtube.com/embed/VIDEO_ID
+      /(?:youtube\.com\/embed\/)([^&\n?#]+)/,
+      // Just the video ID (11 characters)
       /^([a-zA-Z0-9_-]{11})$/,
     ];
 
@@ -73,7 +81,7 @@ export default function YouTubeAudioExtractor({ onAudioExtracted }) {
             type="text"
             value={youtubeUrl}
             onChange={(e) => setYoutubeUrl(e.target.value)}
-            placeholder="Paste YouTube URL (https://youtube.com/watch?v=...)"
+            placeholder="Paste YouTube URL (youtube.com/watch?v=..., shorts/..., or youtu.be/...)"
             disabled={isLoading}
             className="url-input"
           />
