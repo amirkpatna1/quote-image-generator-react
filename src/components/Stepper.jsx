@@ -1,10 +1,19 @@
-const STEPS = [
+const STEPS_OLD = [
   { label: 'Upload CSV',        desc: 'Import your quotes'    },
   { label: 'Configure Style',   desc: 'Choose look & feel'    },
   { label: 'Generate & Export', desc: 'Download your images'  },
 ];
 
-export default function Stepper({ current }) {
+const STEPS_NEW = [
+  { label: '📥 Media Input',       desc: 'Add quotes, videos, audio'  },
+  { label: '⏱️ Composition',       desc: 'Arrange & sync timing'       },
+  { label: '🎨 Design & Effects',  desc: 'Style & transitions'         },
+  { label: '📦 Export',            desc: 'Review & download'           },
+];
+
+export default function Stepper({ current, useNewWorkflow = false }) {
+  const STEPS = useNewWorkflow ? STEPS_NEW : STEPS_OLD;
+
   return (
     <div className="stepper">
       {STEPS.map((s, i) => {

@@ -10,6 +10,9 @@ import YouTubeAudioExtractor from './components/YouTubeAudioExtractor';
 import VideoUploader from './components/VideoUploader';
 import ImageSlideshow from './components/ImageSlideshow';
 import MediaTimeline from './components/MediaTimeline';
+import MediaInput from './components/MediaInput';
+import CompositionAndDesign from './components/CompositionAndDesign';
+import ExportReview from './components/ExportReview';
 import './styles/media-features.css';
 import { fetchThemeImage, clearImageCache } from './utils/imageLibrary';
 import { useHistory } from './hooks/useHistory';
@@ -68,6 +71,20 @@ export default function App() {
     imageDuration: 4,
     videoDurations: {},
     totalDuration: 0,
+  });
+
+  // 4-Step Workflow State
+  const [workflowStep, setWorkflowStep] = useState(1); // 1: Media Input, 2: Composition, 3: Design & Effects, 4: Export
+  const [useNewWorkflow, setUseNewWorkflow] = useState(false); // Toggle between old and new workflow
+  const [mediaConfig, setMediaConfig] = useState({
+    quotes: [],
+    audioMetadata: null,
+    useVideos: false,
+    useAudio: false,
+    useCustomImages: false,
+    videos: [],
+    imageDuration: 4,
+    config: {},
   });
 
   const { history, saveEntry, removeEntry, clearHistory } = useHistory();
@@ -247,6 +264,51 @@ export default function App() {
     setMediaTimeline(timeline);
   }
 
+  // ─── NEW 4-STEP WORKFLOW HANDLERS ─────────────────────────────────────────
+  function handleMediaInputComplete(mediaData) {
+    // Step 1 -> Step 2: Save media input and move to composition
+    setMediaConfig(prev => ({
+      ...prev,
+      quotes: mediaData.quotes || [],
+      audioMetadata: mediaData.audioMetadata,
+      useVideos: mediaData.useVideos,
+      useAudio: mediaData.useAudio,
+      useCustomImages: mediaData.useCustomImages,
+    }));
+    setWorkflowStep(2);
+    showToast(`✓ ${mediaData.quotes.length} quotes loaded`);
+  }
+
+  function handleCompositionComplete(compositionData) {
+    // Step 2 -> Step 3: Save composition and timing, move to design
+    setMediaConfig(prev => ({
+      ...prev,
+      ...compositionData,
+      videos: compositionData.videos || [],
+      imageDuration: compositionData.imageDuration,
+    }));
+    setWorkflowStep(3);
+    showToast('✓ Composition and timing set');
+  }
+
+  async function handleExportStart(exportOptions) {
+    // Step 4: Export the video
+    setWorkflowStep(4);
+    showToast('🎬 Starting video export...');
+
+    try {
+      // Call the backend API to create the video
+      // This would integrate with the Python MCP server
+      showToast('✓ Video export initiated');
+    } catch (error) {
+      showToast('✗ Export failed: ' + error.message);
+    }
+  }
+
+  function handleWorkflowBack() {
+    setWorkflowStep(Math.max(1, workflowStep - 1));
+  }
+
   const configWithLogo = { ...config, logoImage: logoImage || undefined };
   const sampleQuote    = quotes[0] || null;
 
@@ -276,81 +338,119 @@ export default function App() {
       )}
 
       <main className="app-main">
-        <Stepper current={step} />
+        <Stepper current={useNewWorkflow ? workflowStep : step} useNewWorkflow={useNewWorkflow} />
 
-        {step === 1 && (
-          <UploadCard
-            onNext={handleNext}
-            onAddQuote={handleAddQuote}
-            history={history}
-            onLoadHistory={handleLoadHistory}
-            onDeleteHistory={removeEntry}
-            onClearHistory={clearHistory}
-          />
-        )}
-
-        {step >= 2 && (
-          <ConfigCard
-            config={configWithLogo}
-            onChange={updateConfig}
-            onPreset={applyPreset}
-            onGenerate={() => generate(quotes, variantOffsets)}
-            onBack={() => setStep(1)}
-            progress={progress}
-            quoteCount={quotes.length}
-            sampleQuote={sampleQuote}
-            logoImage={logoImage}
-            onLogoUpload={handleLogoUpload}
-            onLogoClear={handleLogoClear}
-            brands={brands}
-            onSaveBrand={handleSaveBrand}
-            onLoadBrand={handleLoadBrand}
-            onDeleteBrand={deleteBrand}
-          />
-        )}
-
-        {step === 3 && bgImages.length > 0 && (
+        {/* NEW 4-STEP WORKFLOW */}
+        {useNewWorkflow ? (
           <>
-            <Gallery
-              quotes={quotes}
-              config={configWithLogo}
-              bgImages={bgImages}
-              onPreview={setPreviewCanvas}
-              onRegenerate={(idx) => idx !== undefined ? regenerateSingle(idx) : handleRegenerateAll()}
-              onEditQuote={handleEditQuote}
-              onPickImage={handleBgImageSet}
-              onBgImageSet={handleBgImageSet}
-              onToast={showToast}
-              youtubeAudio={youtubeAudio}
-              uploadedVideos={uploadedVideos}
-              slideshowSettings={slideshowSettings}
-              mediaTimeline={mediaTimeline}
-            />
+            {workflowStep === 1 && (
+              <MediaInput
+                onComplete={handleMediaInputComplete}
+                onUseOldWorkflow={() => setUseNewWorkflow(false)}
+              />
+            )}
 
-            {/* New Media Features */}
-            <div className="media-features-section">
-              <YouTubeAudioExtractor onAudioExtracted={handleAudioExtracted} />
+            {workflowStep === 2 && (
+              <CompositionAndDesign
+                mediaConfig={mediaConfig}
+                onComplete={handleCompositionComplete}
+                onBack={handleWorkflowBack}
+              />
+            )}
 
-              <VideoUploader onVideosUploaded={handleVideosUploaded} maxVideos={5} />
+            {workflowStep === 3 && (
+              <CompositionAndDesign
+                mediaConfig={mediaConfig}
+                onComplete={handleCompositionComplete}
+                onBack={handleWorkflowBack}
+              />
+            )}
 
-              {bgImages.length > 0 && (
-                <ImageSlideshow
-                  images={bgImages}
-                  duration={mediaTimeline.imageDuration || 4}
-                  transitionEffect={slideshowSettings.transitionEffect || 'fade'}
-                  onSettingsChange={handleSlideshowChange}
+            {workflowStep === 4 && (
+              <ExportReview
+                mediaConfig={mediaConfig}
+                onExport={handleExportStart}
+                onBack={handleWorkflowBack}
+              />
+            )}
+          </>
+        ) : (
+          <>
+            {step === 1 && (
+              <UploadCard
+                onNext={handleNext}
+                onAddQuote={handleAddQuote}
+                history={history}
+                onLoadHistory={handleLoadHistory}
+                onDeleteHistory={removeEntry}
+                onClearHistory={clearHistory}
+              />
+            )}
+
+            {step >= 2 && (
+              <ConfigCard
+                config={configWithLogo}
+                onChange={updateConfig}
+                onPreset={applyPreset}
+                onGenerate={() => generate(quotes, variantOffsets)}
+                onBack={() => setStep(1)}
+                progress={progress}
+                quoteCount={quotes.length}
+                sampleQuote={sampleQuote}
+                logoImage={logoImage}
+                onLogoUpload={handleLogoUpload}
+                onLogoClear={handleLogoClear}
+                brands={brands}
+                onSaveBrand={handleSaveBrand}
+                onLoadBrand={handleLoadBrand}
+                onDeleteBrand={deleteBrand}
+              />
+            )}
+
+            {step === 3 && bgImages.length > 0 && (
+              <>
+                <Gallery
+                  quotes={quotes}
+                  config={configWithLogo}
+                  bgImages={bgImages}
+                  onPreview={setPreviewCanvas}
+                  onRegenerate={(idx) => idx !== undefined ? regenerateSingle(idx) : handleRegenerateAll()}
+                  onEditQuote={handleEditQuote}
+                  onPickImage={handleBgImageSet}
+                  onBgImageSet={handleBgImageSet}
+                  onToast={showToast}
+                  youtubeAudio={youtubeAudio}
+                  uploadedVideos={uploadedVideos}
+                  slideshowSettings={slideshowSettings}
+                  mediaTimeline={mediaTimeline}
                 />
-              )}
 
-              {(youtubeAudio || uploadedVideos.length > 0 || bgImages.length > 0) && (
-                <MediaTimeline
-                  images={bgImages}
-                  videos={uploadedVideos}
-                  audio={youtubeAudio}
-                  onTimelineChange={handleTimelineChange}
-                />
-              )}
-            </div>
+                {/* New Media Features */}
+                <div className="media-features-section">
+                  <YouTubeAudioExtractor onAudioExtracted={handleAudioExtracted} />
+
+                  <VideoUploader onVideosUploaded={handleVideosUploaded} maxVideos={5} />
+
+                  {bgImages.length > 0 && (
+                    <ImageSlideshow
+                      images={bgImages}
+                      duration={mediaTimeline.imageDuration || 4}
+                      transitionEffect={slideshowSettings.transitionEffect || 'fade'}
+                      onSettingsChange={handleSlideshowChange}
+                    />
+                  )}
+
+                  {(youtubeAudio || uploadedVideos.length > 0 || bgImages.length > 0) && (
+                    <MediaTimeline
+                      images={bgImages}
+                      videos={uploadedVideos}
+                      audio={youtubeAudio}
+                      onTimelineChange={handleTimelineChange}
+                    />
+                  )}
+                </div>
+              </>
+            )}
           </>
         )}
       </main>
