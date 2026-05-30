@@ -73,9 +73,10 @@ export default function CompositionAndDesign({
   mediaConfig,
   onComplete,
   onBack,
+  initialTab = 'timing',
 }) {
   const { quotes, audioMetadata, useVideos, useCustomImages } = mediaConfig;
-  const [step, setStep] = useState('timing'); // 'timing' or 'design'
+  const [step, setStep] = useState(initialTab); // 'timing' or 'design'
   const [imageDuration, setImageDuration] = useState(4);
   const [config, setConfig] = useState({
     theme: 'nature',

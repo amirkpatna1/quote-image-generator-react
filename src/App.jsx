@@ -291,6 +291,19 @@ export default function App() {
     showToast('✓ Composition and timing set');
   }
 
+  function handleDesignComplete(designData) {
+    // Step 3 -> Step 4: Save design + composition data, move to export
+    setMediaConfig(prev => ({
+      ...prev,
+      ...designData,
+      videos: designData.videos || prev.videos || [],
+      imageDuration: designData.imageDuration || prev.imageDuration,
+      config: designData.config || prev.config,
+    }));
+    setWorkflowStep(4);
+    showToast('✓ Design and effects set');
+  }
+
   async function handleExportStart(exportOptions) {
     // Step 4: Export the video
     setWorkflowStep(4);
@@ -361,8 +374,9 @@ export default function App() {
             {workflowStep === 3 && (
               <CompositionAndDesign
                 mediaConfig={mediaConfig}
-                onComplete={handleCompositionComplete}
+                onComplete={handleDesignComplete}
                 onBack={handleWorkflowBack}
+                initialTab="design"
               />
             )}
 
