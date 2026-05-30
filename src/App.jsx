@@ -75,7 +75,7 @@ export default function App() {
 
   // 4-Step Workflow State
   const [workflowStep, setWorkflowStep] = useState(1); // 1: Media Input, 2: Composition, 3: Design & Effects, 4: Export
-  const [useNewWorkflow, setUseNewWorkflow] = useState(false); // Toggle between old and new workflow
+  const [useNewWorkflow, setUseNewWorkflow] = useState(true); // Toggle between old and new workflow - DEFAULT TO NEW
   const [mediaConfig, setMediaConfig] = useState({
     quotes: [],
     audioMetadata: null,
